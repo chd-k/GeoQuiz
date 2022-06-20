@@ -8,7 +8,8 @@ There is GeoQuiz app from "Android Programming: Big Nerd Ranch Guide" book
 * Activity
 * TextView
 * Button
-* Toasts (version 01)
+* View Binding
+* Toast (version 01)
 * Snackbar (version 02)
 <p align="right">(<a href="#top">back to top</a>)</p>
 
