@@ -1,8 +1,10 @@
 package com.bignerdranch.android.geoquiz
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -13,6 +15,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val quizViewModel: QuizViewModel by viewModels()
+    private val cheatLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) quizViewModel.isCheater =
+                result.data?.getBooleanExtra(EXTRA_ANSWER_SHOWN, false) ?: false
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +36,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding.nextButton.setOnClickListener {
             nextQuestion()
+        }
+        binding.cheatButton.setOnClickListener {
+            val intent =
+                CheatActivity.newIntent(this@MainActivity, quizViewModel.currentQuestionAnswer)
+            cheatLauncher.launch(intent)
         }
 
         updateQuestion()
@@ -53,12 +65,20 @@ class MainActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = quizViewModel.currentQuestionAnswer
         val messageResId: Int
-        if (userAnswer == correctAnswer) {
-            messageResId = R.string.correct_snackbar
-            quizViewModel.putToAnswerMap(1)
-        } else {
-            messageResId = R.string.incorrect_snackbar
-            quizViewModel.putToAnswerMap(0)
+        when {
+            quizViewModel.isCheater -> {
+                messageResId = R.string.judgment_snackbar
+                quizViewModel.captureCheating()
+            }
+            quizViewModel.isCurrentQuestionCheated -> messageResId = R.string.judgment_snackbar
+            userAnswer == correctAnswer -> {
+                messageResId = R.string.correct_snackbar
+                quizViewModel.putToAnswerMap(1)
+            }
+            else -> {
+                messageResId = R.string.incorrect_snackbar
+                quizViewModel.putToAnswerMap(0)
+            }
         }
 
         Snackbar.make(
@@ -77,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         if (score != 0) {
             Toast.makeText(
                 this,
-                "Your score $score %!",
+                getString(R.string.user_result, score),
                 Toast.LENGTH_SHORT
             ).show()
         }
