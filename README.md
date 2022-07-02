@@ -2,8 +2,10 @@
 
 # GeoQuiz
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 There is GeoQuiz app from "Android Programming: Big Nerd Ranch Guide" book
+
 ### Built With
 * Activity
 * TextView
@@ -12,7 +14,8 @@ There is GeoQuiz app from "Android Programming: Big Nerd Ranch Guide" book
 * ViewModel
 * Toast
 * Snackbar
-###Testing
+
+### Testing
 There are JVM tests and instrumented tests in my project.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
